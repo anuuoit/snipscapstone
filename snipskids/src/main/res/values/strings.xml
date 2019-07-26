@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">snips kids</string>
+    <string name="wake_word">Say -> Hey Snips</string>
+    <string name="wake_word_continue">Say -> Hey Snips to continue</string>
+    <string name="voice_command">Listening...\n
+        Good Morning!\n
+        How are you?\n
+        What is your name?\n
+        What is 1 plus 2?\n
+        Tell me some fruits/vegetables/animals \n
+        Tell me a story \n
+        Play music \n
+    </string>
+</resources>
