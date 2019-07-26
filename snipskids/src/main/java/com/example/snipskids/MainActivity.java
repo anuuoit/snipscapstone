@@ -28,9 +28,7 @@ import java.util.zip.ZipInputStream;
 
 import ai.snips.hermes.IntentMessage;
 import ai.snips.hermes.SessionEndedMessage;
-import ai.snips.hermes.Slot;
 import ai.snips.hermes.TextCapturedMessage;
-import ai.snips.nlu.ontology.SlotValue;
 import ai.snips.platform.SnipsPlatformClient;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function0;
@@ -167,14 +165,6 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 // Intent detected, so the dialog session here
                 client.endSession(intentMessage.getSessionId(), null);
                 final String intentName = intentMessage.getIntent().getIntentName();
-                Log.d(TAG, "Intent detected: " + intentMessage.getIntent().getIntentName());
-                Log.d(TAG, "Slots detected: " + intentMessage.getSlots());
-
-
-                int firstNum = -1;
-                int secondNum = -1;
-                int iconRes = R.drawable.confused;
-                String response = "I don't understand";
 
                 textViewInfo.setText("");
                 imageViewIcon.setVisibility(View.VISIBLE);
@@ -182,141 +172,45 @@ public class MainActivity extends AppCompatActivity implements TextToSpeech.OnIn
                 if (mPlayer != null) {
                     mPlayer.stop();
                 }
-                Log.d("Anu", intentName);
+                Response intentResponse = ProcessIntentMessage.getInstance().process(intentMessage);
                 if (intentName.equals("anuprakash:add")
                         || intentName.equals("anuprakash:minus")
                         || intentName.equals("anuprakash:multiply")
                         || intentName.equals("anuprakash:divide")) {
 
-                    for (Slot slot : intentMessage.getSlots()) {
-
-                        if (slot.getValue() instanceof SlotValue.NumberValue) {
-                            double value = ((SlotValue.NumberValue) slot.getValue()).getValue();
-                            Log.d("Anu", String.valueOf(value));
-                            if (slot.getSlotName().equals("firstNumber")) {
-                                firstNum = (int) value;
-                            } else if (slot.getSlotName().equals("secondNumber")) {
-                                secondNum = (int) value;
-                            }
-                        }
-                    }
-                    if (firstNum != -1 && secondNum != -1) {
-                        Log.d("Anu", "firstNumber " + firstNum);
-                        Log.d("Anu", "secondNumber " + secondNum);
-                        int answer = 0;
-                        if (intentName.equals("anuprakash:add")) {
-                            answer = firstNum + secondNum;
-                        } else if (intentName.equals("anuprakash:minus")) {
-                            answer = firstNum - secondNum;
-                        } else if (intentName.equals("anuprakash:multiply")) {
-                            answer = firstNum * secondNum;
-                        } else {
-                            answer = firstNum / secondNum;
-                        }
-                        Log.d("Anu", "answer " + answer);
-                        response = "It is " + answer;
-                        iconRes = R.drawable.math;
-                        textViewResult.setText(String.valueOf(answer));
+                    if (intentResponse != null) {
+                        textViewResult.setText(intentResponse.getResponseString());
                         imageViewIcon.setVisibility(View.GONE);
                         textViewResult.setVisibility(View.VISIBLE);
                     }
 
                 } else if (intentName.equals("anuprakash:playitem")) {
-                    for (Slot slot : intentMessage.getSlots()) {
-
-                        if (slot.getSlotName().equals("item")) {
-                            if (slot.getValue() instanceof SlotValue.CustomValue) {
-                                String value = ((SlotValue.CustomValue) slot.getValue()).getValue();
-                                Log.d("Anu", value);
-                                if (value.equals("music")) {
-                                    response = "Playing music";
-                                    mPlayer = MediaPlayer.create(MainActivity.this, R.raw.twinkle);
-                                    mPlayer.start();
-                                    iconRes = R.drawable.music;
-                                }
-                            }
+                    if (intentMessage != null) {
+                        if (intentResponse.getAction() == Response.Action.MUSIC) {
+                            mPlayer = MediaPlayer.create(MainActivity.this, R.raw.twinkle);
+                            mPlayer.start();
                         }
                     }
                 } else if (intentName.equals("anuprakash:tell")) {
-                    for (Slot slot : intentMessage.getSlots()) {
-
-                        if (slot.getSlotName().equals("item")) {
-                            if (slot.getValue() instanceof SlotValue.CustomValue) {
-                                String value = ((SlotValue.CustomValue) slot.getValue()).getValue();
-                                Log.d("Anu", value);
-                                if (value.equals("story")) {
-                                    iconRes = R.drawable.story;
-                                    response = "telling story";
-                                    mPlayer = MediaPlayer.create(MainActivity.this, R.raw.story);
-                                    mPlayer.start();
-                                } else if (value.equals("joke")) {
-                                    response = "Oh my god! You look like a chicken. I am going to eat you";
-                                    iconRes = R.drawable.joke;
-                                } else if (value.equals("fruits")) {
-                                    response = "Apple, Orange, Kiwi, Grapes, Banana";
-                                    iconRes = R.drawable.fruits;
-                                } else if (value.equals("vegetables")) {
-                                    response = "Carrot, broccoli, capsicum, cucumber";
-                                    iconRes = R.drawable.vegetables;
-                                } else if (value.equals("animals")) {
-                                    response = "Tiger, Giraffe, Snake, Zebra";
-                                    iconRes = R.drawable.animals;
-                                }
-                            }
+                    if (intentMessage != null) {
+                        if(intentResponse.getAction() == Response.Action.STORY){
+                            mPlayer = MediaPlayer.create(MainActivity.this, R.raw.story);
+                            mPlayer.start();
                         }
                     }
-                } else if (intentName.equals("anuprakash:greetings")) {
-                    for (Slot slot : intentMessage.getSlots()) {
-
-                        if (slot.getSlotName().equals("greeting")) {
-                            if (slot.getValue() instanceof SlotValue.CustomValue) {
-                                String value = ((SlotValue.CustomValue) slot.getValue()).getValue();
-                                Log.d("Anu", value);
-                                if (value.equalsIgnoreCase("Good morning")) {
-                                    response = "Good Morning! Have a nice day";
-                                    iconRes = R.drawable.sun;
-                                } else if (value.equals("Good night")) {
-                                    response = "Good Night and Sweet dreams";
-                                    iconRes = R.drawable.moon;
-                                } else if (value.equals("bye")) {
-                                    response = "Good bye";
-                                    iconRes = R.drawable.bye;
-                                } else if (value.equals("hello") || (value.equals("hi"))) {
-                                    response = "Hello buddy";
-                                    iconRes = R.drawable.questions;
-                                } else if (value.equalsIgnoreCase("Sweet dreams")) {
-                                    response = "Good Night! Sweet dreams";
-                                    iconRes = R.drawable.moon;
-                                }
-                            }
-                        }
-                    }
-
-                } else if (intentName.equals("anuprakash:questions")) {
-                    for (Slot slot : intentMessage.getSlots()) {
-
-                        if (slot.getSlotName().equals("question")) {
-                            if (slot.getValue() instanceof SlotValue.CustomValue) {
-                                String value = ((SlotValue.CustomValue) slot.getValue()).getValue();
-                                Log.d("Anu", value);
-                                if (value.equalsIgnoreCase("How are you?")) {
-                                    response = "I am doing good. How are you?";
-                                    iconRes = R.drawable.questions;
-                                } else if (value.equalsIgnoreCase("What is your name?")) {
-                                    response = "My name is snips. What is your name?";
-                                    iconRes = R.drawable.questions;
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    response = "What!!!!";
                 }
 
                 textViewInfo.setText(R.string.wake_word_continue);
-                imageViewIcon.setImageResource(iconRes);
-                TTS.getInstance().saySomething(response, 1);
-
+                if (intentResponse != null) {
+                    imageViewIcon.setImageResource(intentResponse.getIconRes());
+                    TTS.getInstance()
+                            .saySomething(
+                                    intentResponse.getResponseString() == null ? getString(intentResponse.getResponseStringRes()) : intentResponse.getResponseString(),
+                                    1);
+                } else {
+                    imageViewIcon.setImageResource(R.drawable.confused);
+                    TTS.getInstance().saySomething(getString(R.string.resp_not_understand),1);
+                }
                 return null;
             }
         });

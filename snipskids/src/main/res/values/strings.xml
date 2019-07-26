@@ -11,4 +11,19 @@
         Tell me a story \n
         Play music \n
     </string>
+    <string name="resp_what_is_your_name">My name is snips. What is your name?</string>
+    <string name="resp_how_are_you">I am doing good. How are you?"</string>
+    <string name="resp_sweet_dreams">Good Night! Sweet dreams</string>
+    <string name="resp_hello">Hello buddy</string>
+    <string name="resp_bye">Good bye</string>
+    <string name="resp_good_morning">Good Morning! Have a nice day</string>
+    <string name="resp_good_night">Good Night and Sweet dreams</string>
+
+    <string name="resp_fruits">Apple, Orange, Kiwi, Grapes, Banana</string>
+    <string name="resp_vegetables">Carrot, broccoli, capsicum, cucumber</string>
+    <string name="resp_animals">Tiger, Giraffe, Snake, Zebra</string>
+    <string name="resp_joke1">Oh my god! You look like a chicken. I am going to eat you</string>
+    <string name="resp_story">telling story</string>
+    <string name="resp_music">Playing music</string>
+    <string name="resp_not_understand">I don\'t understand</string>
 </resources>
